@@ -1,0 +1,40 @@
+To monitor CPU usage in SQL Server:
+------------------------------------------
+Open SQL Server Management Studio (SSMS): Connect to the SQL Server instance you want to monitor.
+Run the CPU Usage Monitoring Query: Use a query that leverages Dynamic Management Views (DMVs) to retrieve details about CPU usage.
+Analyze the Results: Identify sessions or queries that are using high CPU resources and take appropriate actions, such as optimizing queries or investigating further.
+
+Code
+--------
+SQL query to monitor CPU usage by active sessions in SQL Server:
+
+SELECT
+r.session_id,
+r.cpu_time AS CPUTime_MS,
+r.total_elapsed_time AS TotalElapsedTime_MS,
+r.logical_reads AS LogicalReads,
+r.reads AS PhysicalReads,
+r.writes AS Writes,
+st.text AS QueryText
+FROM
+sys.dm_exec_requests r
+JOIN
+sys.dm_exec_sessions s ON r.session_id = s.session_id
+CROSS APPLY
+sys.dm_exec_sql_text(r.sql_handle) AS st
+ORDER BY
+r.cpu_time DESC;
+
+
+Result of Code:
+--------------------------
+● session_id: The unique identifier for each session currently connected to the SQLServer instance. It allows you to track which session is consuming CPU resources.
+● CPUTime_MS: The total CPU time consumed by the session, in milliseconds. Higher values indicate more CPU usage.
+● TotalElapsedTime_MS: The total time the query has been running, in milliseconds. This can help in understanding if a long-running query is contributing to high CPU usage.
+● LogicalReads: The number of logical read operations performed by the session. High logical reads might indicate that the session is processing a large amount of data.
+● PhysicalReads: The number of physical read operations performed by the session. High physical reads can indicate that the query is fetching data from disk, which mightcontribute to CPU usage.
+● Writes: The number of write operations performed by the session. Monitoring writes canhelp in understanding how much data the session is modifying.
+● QueryText: The actual SQL text being executed by the session. This helps in identifying which queries are responsible for the CPU load.
+
+
+
