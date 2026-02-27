@@ -1,0 +1,28 @@
+To monitor memory usage in SQL Server:
+--------------------------------------
+1. Access SQL Server Management Studio (SSMS): Connect to the SQL Server instance you wish to monitor.
+2. Run a Memory Usage Monitoring Query: Use DMVs to retrieve detailed information about memory usage.
+3. Analyze the Results: Identify areas where memory pressure might be occurring or where memory usage can be optimized.
+
+Code
+--------------------
+SQL query can be used to monitor memory usage in SQL Server:
+
+SELECT
+type AS MemoryType,
+SUM(pages_kb) / 1024 AS MemoryUsage_MB
+FROM
+sys.dm_os_memory_clerks
+GROUP BY
+type
+ORDER BY
+SUM(pages_kb) DESC;
+
+
+This query provides an overview of memory usage by different types of memory clerks, helping to identify where the most memory is being consumed.
+
+Explain Result of Code:
+--------------------------
+● MemoryType: Indicates the type of memory clerk, such as 'CACHESTORE_SQLCP' (for cached SQL plans), 'CACHESTORE_OBJCP' (for cached object plans), and others. These clerks are responsible for managing memory in different areas of SQL Server.
+● MemoryUsage_MB: The total memory used by each type of clerk, in megabytes. This shows how much memory each component of SQL Server is consuming. A high value in certain memory types might indicate that SQL Server is holding onto more memory than necessary, potentially leading to memory pressure.
+● GROUP BY and ORDER BY: The query groups the memory usage by clerk type and orders the results by the amount of memory used, making it easy to identify which clerks are using the most memory.
